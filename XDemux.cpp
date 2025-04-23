@@ -114,7 +114,7 @@ AVPacket* XDemux::Read()
     pkt->dts = pkt->dts * (1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
 
     mux.unlock();
-    //cout << pkt->pts << " " << flush;//强制刷新缓冲区的数据
+    cout << pkt->pts << " " << flush;//强制刷新缓冲区的数据
     return pkt;
 }
 
@@ -146,8 +146,44 @@ AVCodecParameters* XDemux::CopyAPara()
 
 bool XDemux::Seek(double pos)
 {
+    mux.lock();
+    if (!ic)
+    {
+        mux.unlock();
+        return false;
+    }
+    //清理读取缓冲
+    avformat_flush(ic);
+
+    long long seekPos = 0;
+    seekPos = ic->streams[videoStream]->duration * pos;
+    int re = av_seek_frame(ic, videoStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    mux.unlock();
+    if (re < 0) return false;
     return true;
 }
+
+//void XDemux::Clear()
+//{
+//    mux.lock();
+//    if (!ic) {
+//        mux.unlock();
+//        return;
+//    }
+//    avformat_flush(ic);
+//    mux.unlock();
+//}
+//
+//void XDemux::Close()
+//{
+//    mux.lock();
+//    if (!ic) {
+//        mux.unlock();
+//    }
+//    avformat_close_input(&ic);
+//    totalMs = 0;
+//    mux.unlock();
+//}
 
 XDemux::XDemux()
 {

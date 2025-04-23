@@ -14,15 +14,17 @@ public:
 	virtual AVPacket *Read();
 
 	//获取视频参数  返回的空间需要清理  avcodec_parameters_free
-	virtual AVCodecParameters* CopyVPara();
+	virtual AVCodecParameters *CopyVPara();
 
 	//获取音频参数  返回的空间需要清理  avcodec_parameters_free
-	virtual AVCodecParameters* CopyAPara();
+	virtual AVCodecParameters *CopyAPara();
 
 	//Seek位置 pos（0.0 ~ 1.0）
 	virtual bool Seek(double pos);
 
-
+	////清空读取缓存
+	//virtual void Clear();
+	//virtual void Close();
 
 
 	XDemux();
