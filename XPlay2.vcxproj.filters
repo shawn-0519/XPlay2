@@ -43,9 +43,15 @@
     <ClCompile Include="XDemux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XDecodec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XDemux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XDecodec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

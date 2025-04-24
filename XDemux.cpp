@@ -18,7 +18,8 @@ static double r2d(AVRational r)
 
 bool XDemux::Open(const char* url)
 {
-    //参数设置
+    Close();
+   //参数设置
     AVDictionary* opts = NULL;
     //设置rtsp流已tcp协议打开
     av_dict_set(&opts, "rtsp_transport", "tcp", 0);
@@ -163,27 +164,29 @@ bool XDemux::Seek(double pos)
     return true;
 }
 
-//void XDemux::Clear()
-//{
-//    mux.lock();
-//    if (!ic) {
-//        mux.unlock();
-//        return;
-//    }
-//    avformat_flush(ic);
-//    mux.unlock();
-//}
-//
-//void XDemux::Close()
-//{
-//    mux.lock();
-//    if (!ic) {
-//        mux.unlock();
-//    }
-//    avformat_close_input(&ic);
-//    totalMs = 0;
-//    mux.unlock();
-//}
+void XDemux::Clear()
+{
+    mux.lock();
+    if (!ic) {
+        mux.unlock();
+        return;
+    }
+    //清理读取缓冲
+    avformat_flush(ic);
+    mux.unlock();
+}
+
+void XDemux::Close()
+{
+    mux.lock();
+    if (!ic) {
+        mux.unlock();
+        return;
+    }
+    avformat_close_input(&ic);
+    totalMs = 0;
+    mux.unlock();
+}
 
 XDemux::XDemux()
 {

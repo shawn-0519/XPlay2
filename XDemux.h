@@ -22,9 +22,9 @@ public:
 	//Seek位置 pos（0.0 ~ 1.0）
 	virtual bool Seek(double pos);
 
-	////清空读取缓存
-	//virtual void Clear();
-	//virtual void Close();
+	//清空读取缓存
+	virtual void Clear();
+	virtual void Close();
 
 
 	XDemux();
