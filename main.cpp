@@ -1,34 +1,45 @@
 ﻿#include "XPlay2.h"
 #include <QtWidgets/QApplication>
 #include "XDemux.h"
-#include "XDecodec.h"
+#include "XDecode.h"
 #include <iostream>
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    XDemux demux;
-    cout << "demux.Open = " << demux.Open("Tom-and-jerry.mp4");
-    demux.Read();
-    demux.Clear();
-    demux.Close();
-    cout << "demux.Open = " << demux.Open("v1080.mp4");
+	///测试XDemux
+	XDemux demux;
 
-    cout << "demux.CopyVPara() = " << demux.CopyVPara() << endl;
-    cout << "demux.CopyAPara() = " << demux.CopyAPara() << endl;
+	const char* url = "Tom-and-jerry.mp4";
+	cout << "demux.Open = " << demux.Open(url);
+	cout << "CopyVPara = " << demux.CopyVPara() << endl;
+	cout << "CopyAPara = " << demux.CopyAPara() << endl;
+	cout << "seek=" << demux.Seek(0.95) << endl;
 
-    cout << "demux.Seek() = " << demux.Seek(0.95) << endl;
+	/////////////////////////////
+	///解码测试
+    XDecode vdecodec;
+	cout << "vdecode.Open() = " << vdecodec.Open(demux.CopyVPara()) << endl;
+	//vdecode.Clear();
+	//vdecode.Close();
+    XDecode adecodec;
+	cout << "adecode.Open() = " << adecodec.Open(demux.CopyAPara()) << endl;
 
-    XDecodec vdecodec;
-    cout << "vdecodec.Open(demux.CopyVPara()):" << vdecodec.Open(demux.CopyVPara()) << endl;
-    vdecodec.Clear();
-    vdecodec.Close();
-    XDecodec adecode;
-    cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
+
 
     for(;;)
     {
         AVPacket *pkt = demux.Read();
+        if (demux.IsAudio(pkt))
+        {
+            adecodec.Send(pkt);
+            AVFrame *frame = adecodec.Recv();
+        }
+        else
+        {
+            vdecodec.Send(pkt);
+            AVFrame *frame = vdecodec.Recv();
+        }
         if (!pkt)break;
     }
 

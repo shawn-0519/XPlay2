@@ -45,7 +45,7 @@ bool XDemux::Open(const char* url)
     }
     cout << "open " << url << " success! " << endl;
 
-    //获取流信息 
+    //获取流信息
     re = avformat_find_stream_info(ic, 0);
 
     //总时长 毫秒
@@ -66,7 +66,7 @@ bool XDemux::Open(const char* url)
     AVStream* as = ic->streams[videoStream];
 
     cout << "===============================================" << endl;
-    cout << videoStream << "视频信息" << endl;
+    cout << videoStream << "Vedio Format" << endl;
     cout << "codec_id = " << as->codecpar->codec_id << endl;
     cout << "format = " << as->codecpar->format << endl;
     cout << "width=" << as->codecpar->width << endl;
@@ -74,9 +74,8 @@ bool XDemux::Open(const char* url)
     //帧率 fps 分数转换
     cout << "video fps = " << r2d(as->avg_frame_rate) << endl;
 
-
     cout << "===============================================" << endl;
-    cout << audioStream << "音频信息" << endl;
+    cout << audioStream << "Audio Format" << endl;
     //获取音频流
     audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
     as = ic->streams[audioStream];
@@ -115,7 +114,7 @@ AVPacket* XDemux::Read()
     pkt->dts = pkt->dts * (1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
 
     mux.unlock();
-    cout << pkt->pts << " " << flush;//强制刷新缓冲区的数据
+    //cout << pkt->pts << " " << flush;//强制刷新缓冲区的数据
     return pkt;
 }
 
@@ -127,7 +126,7 @@ AVCodecParameters* XDemux::CopyVPara()
         return 0;
     }
     AVCodecParameters* par = avcodec_parameters_alloc();
-    avcodec_parameters_copy(par, ic->streams[videoStream]->codecpar);
+    avcodec_parameters_copy(par, ic->streams[vedioStream]->codecpar);
     mux.unlock();
     return par;
 }
@@ -145,6 +144,13 @@ AVCodecParameters* XDemux::CopyAPara()
     return par;
 }
 
+bool XDemux::IsAudio(AVPacket* pkt)
+{
+    if (!pkt)return false;
+    if (pkt->stream_index == vedioStream)return false;
+    return true;
+}
+
 bool XDemux::Seek(double pos)
 {
     mux.lock();
@@ -157,8 +163,8 @@ bool XDemux::Seek(double pos)
     avformat_flush(ic);
 
     long long seekPos = 0;
-    seekPos = ic->streams[videoStream]->duration * pos;
-    int re = av_seek_frame(ic, videoStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    seekPos = ic->streams[vedioStream]->duration * pos;
+    int re = av_seek_frame(ic, vedioStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
     mux.unlock();
     if (re < 0) return false;
     return true;

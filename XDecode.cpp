@@ -1,12 +1,13 @@
-#include "XDecodec.h"
+#include "XDecode.h"
 extern "C"
 {
 #include<libavcodec/avcodec.h>
+#include<libavutil/avutil.h>
 }
 #include <iostream>
 using namespace std;
 
-void XDecodec::Close()
+void XDecode::Close()
 {
     mux.lock();
     if (codec) {
@@ -17,7 +18,7 @@ void XDecodec::Close()
     mux.unlock();
 }
 
-void XDecodec::Clear()
+void XDecode::Clear()
 {
     mux.lock();
     if (codec) {
@@ -27,7 +28,7 @@ void XDecodec::Clear()
 }
 
 //打开解码器
-bool XDecodec::Open(AVCodecParameters* para)
+bool XDecode::Open(AVCodecParameters* para)
 {
     if (!para) return false;
     Close();
@@ -72,10 +73,44 @@ bool XDecodec::Open(AVCodecParameters* para)
 
 
 
-XDecodec::XDecodec()
+bool XDecode::Send(AVPacket* pkt)
+{
+    //容错处理
+    if(!pkt || pkt->size <= 0 || !pkt->data)return false;
+    mux.lock();
+    if (!codec){
+        mux.unlock();
+        return false;
+    }
+    int re = avcodec_send_packet(codec, pkt);
+    mux.unlock();
+    av_packet_free(&pkt);
+    if (re != 0) return false;
+    return true;
+}
+
+AVFrame * XDecode::Recv()
+{
+    mux.lock();
+    if (!codec) {
+        mux.unlock();
+        return nullptr;
+    }
+    AVFrame *frame = av_frame_alloc();
+    int re = avcodec_receive_frame(codec,frame);
+    mux.unlock();
+    if (re != 0) {
+        av_frame_free(&frame);
+        return nullptr;
+    }
+    //cout << "[" << frame->linesize[0] << "] " << flush;
+    return frame;
+}
+
+XDecode::XDecode()
 {
 }
 
-XDecodec::~XDecodec()
+XDecode::~XDecode()
 {
 }

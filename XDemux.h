@@ -19,6 +19,9 @@ public:
 	//获取音频参数  返回的空间需要清理  avcodec_parameters_free
 	virtual AVCodecParameters *CopyAPara();
 
+	//是否是音频
+	virtual bool IsAudio(AVPacket* pkt);
+
 	//Seek位置 pos（0.0 ~ 1.0）
 	virtual bool Seek(double pos);
 
@@ -37,7 +40,7 @@ protected:
 	//解封装上下文
 	AVFormatContext* ic = nullptr;
 	//音视频索引，读取时区分音视频
-	int videoStream = 0;
+	int vedioStream = 0;
 	int audioStream = 1;
 };
 
