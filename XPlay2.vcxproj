@@ -102,7 +102,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="XVedioWidget.cpp" />
+    <ClCompile Include="XResample.cpp" />
+    <ClCompile Include="XVideoWidget.cpp" />
     <QtRcc Include="XPlay2.qrc" />
     <QtUic Include="XPlay2.ui" />
     <QtMoc Include="XPlay2.h" />
@@ -114,7 +115,8 @@
   <ItemGroup>
     <ClInclude Include="XDecode.h" />
     <ClInclude Include="XDemux.h" />
-    <QtMoc Include="XVedioWidget.h" />
+    <ClInclude Include="XResample.h" />
+    <QtMoc Include="XVideoWidget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
