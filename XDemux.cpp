@@ -64,6 +64,8 @@ bool XDemux::Open(const char* url)
     //获取视频流
     videoStream = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     AVStream* as = ic->streams[videoStream];
+
+    //set width height
     width = as->codecpar->width;
     height = as->codecpar->height;
 
@@ -81,14 +83,20 @@ bool XDemux::Open(const char* url)
     //获取音频流
     audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
     as = ic->streams[audioStream];
+
+    //set sampleRate channels
+    sampleRate = as->codecpar->sample_rate;
+    channels = as->codecpar->ch_layout.nb_channels;
+
     cout << "codec_id = " << as->codecpar->codec_id << endl;
     cout << "format = " << as->codecpar->format << endl;
     cout << "sample_rate = " << as->codecpar->sample_rate << endl;
     //AVSampleFormat;
-    //cout << "channels = " << as->codecpar->channels << endl;
+    cout << "channels = " << as->codecpar->ch_layout.nb_channels << endl;
     //一帧数据？？ 单通道样本数 
     cout << "frame_size = " << as->codecpar->frame_size << endl;
     //1024 * 2 * 2 = 4096  fps = sample_rate/frame_size
+
     mux.unlock();
     
     return true;

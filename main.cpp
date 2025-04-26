@@ -1,11 +1,13 @@
-﻿#include "XPlay2.h"
+﻿#include <QThread>
+#include <iostream>
 #include <QtWidgets/QApplication>
 #include "XDemux.h"
 #include "XDecode.h"
-#include <iostream>
 #include "XVideoWidget.h"
 #include "XResample.h"
-#include <QThread>
+#include "XPlay2.h"
+#include "XAudioPlay.h"
+
 using namespace std;
 
 class TestThread :public QThread {
@@ -17,7 +19,7 @@ public:
         cout << "demux.Open = " << demux.Open(url);
         cout << "CopyVPara = " << demux.CopyVPara() << endl;
         cout << "CopyAPara = " << demux.CopyAPara() << endl;
-        cout << "seek=" << demux.Seek(0.95) << endl;
+        //cout << "seek=" << demux.Seek(0.95) << endl;
 
         /////////////////////////////
         ///解码测试
@@ -26,6 +28,13 @@ public:
         //vdecode.Close();
         cout << "resample.Open() = " << resample.Open(demux.CopyAPara()) << endl;
         cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
+        cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
+
+        /////////////////////////////
+        ///XAudioPlay测试
+        XAudioPlay::Get()->channels = demux.channels;
+        XAudioPlay::Get()->sampleRate = demux.sampleRate;
+        cout << "XAudioPlay::Get()->Open() = " << XAudioPlay::Get()->Open() << endl;
     }
     unsigned char* pcm = new unsigned char[1024 * 1024];
     void run() {
@@ -61,6 +70,9 @@ int main(int argc, char *argv[])
 
     TestThread tt;
     tt.Init();
+
+
+
     
     /*for (;;)
     {
