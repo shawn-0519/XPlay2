@@ -8,7 +8,7 @@ class XResample
 {
 public:
 	//输出参数和输入参数一致除了采样格式，输出为S16 ,会释放para
-	virtual bool Open(AVCodecParameters* para);
+	virtual bool Open(AVCodecParameters* para, bool isClearPara);
 
 	virtual void Close();
 
