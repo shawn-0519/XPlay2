@@ -8,7 +8,9 @@
 class CXAudioPlay :public XAudioPlay {
 public:
 
+	//音频数据的播放和管理
 	QAudioSink* output = nullptr;
+	//音频输出流
 	QIODevice* io = nullptr;
 	//音频设备
 	QAudioDevice dev = QMediaDevices::defaultAudioOutput();
@@ -55,6 +57,35 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	virtual bool Write(const unsigned char* data, int datasize)
+	{
+		if (!data || datasize <=0) return false;
+		mux.lock();
+		if (!io || !output) {
+			mux.unlock();
+			return false;
+		}
+		//把准备好的音频PCM数据写入到声卡缓冲区，驱动声卡播放音频。
+		int size = io->write((char*)data, datasize);
+		mux.unlock();
+		if (datasize != size)return false;
+		return true;
+	}
+
+	//检查空间是否足够
+	virtual int Getfree()
+	{
+		mux.lock();
+		if (!output) {
+			mux.unlock();
+			return 0;
+		}
+		//查询声卡缓冲区的“空闲空间”
+		int free = output->bytesFree();
+		mux.unlock();
+		return free;
 	}
 
 };
