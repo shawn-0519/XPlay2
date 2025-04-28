@@ -3,8 +3,9 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
+#include "IVideoCall.h"
 struct AVFrame;
-class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions, public IVideoCall
 {
 	Q_OBJECT
 

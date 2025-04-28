@@ -7,7 +7,7 @@ extern "C"
 }
 #include <iostream>
 #pragma comment(lib,"swresample.lib")
-bool XResample::Open(AVCodecParameters* para)
+bool XResample::Open(AVCodecParameters* para, bool isClearPara)
 {
     if (!para)return false;
     // 定义输出和输入声道布局
@@ -18,16 +18,17 @@ bool XResample::Open(AVCodecParameters* para)
     av_channel_layout_default(&in_ch_layout, para->ch_layout.nb_channels); // input channels
     
     int re = swr_alloc_set_opts2(
-        &actx,                  //SwrContext
-        &out_ch_layout,         //out_channel
-        AV_SAMPLE_FMT_S16,      //out_sample_fmt
-        para->sample_rate,      //out_sample_rate
-        &in_ch_layout,          //in_ch_layout
-        AV_SAMPLE_FMT_S16,      //in_sample_fmt
-        para->sample_rate,      //in_sample_rate
-        0,0                     //log_offset/ log_ctx
+        &actx,                          //SwrContext
+        &out_ch_layout,                 //out_channel
+        (AVSampleFormat)outFormat,      //out_sample_fmt
+        para->sample_rate,              //out_sample_rate
+        &in_ch_layout,                  //in_ch_layout
+        (AVSampleFormat)para->format,   //in_sample_fmt
+        para->sample_rate,              //in_sample_rate
+        0,0                             //log_offset/ log_ctx
         );
-    
+    if (isClearPara)
+        avcodec_parameters_free(&para);
     re = swr_init(actx);
     mux.unlock();
     if (re != 0)
