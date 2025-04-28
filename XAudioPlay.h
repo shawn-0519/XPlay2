@@ -5,14 +5,7 @@ public:
 	//打开音频播放	纯虚函数
 	virtual bool Open() = 0;
 
-
 	virtual void Close() = 0;
-
-
-	virtual bool Write(const unsigned char *data, int datasize) = 0;
-
-	//检查空间是否足够
-	virtual int Getfree() = 0;
 
 	//实现单例模式 ，确保整个程序中只有一个 CXAudioPlay 对象实例
 	static XAudioPlay* Get();
